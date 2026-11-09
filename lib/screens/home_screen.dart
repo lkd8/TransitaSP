@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/rotina.dart';
 import '../services/preferences_service.dart';
+import '../services/rotina_service.dart';
 import '../theme/theme_toggle_scope.dart';
 import 'rotinas_screen.dart';
 import 'nova_rotina_screen.dart';
@@ -18,6 +19,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final PreferencesService _preferencesService = PreferencesService();
+  final RotinaService _rotinaService = RotinaService();
 
   List<Rotina> _rotinas = [];
   int _minutosEconomizados = 0;
@@ -42,31 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int get _rotinasAtivas => _rotinas.where((r) => r.ativa).length;
 
-  Rotina? get _proximaSaida {
-    final rotinasAtivas = _rotinas.where((r) => r.ativa).toList();
-    if (rotinasAtivas.isEmpty) return null;
-
-    final hoje = DateTime.now();
-    final diaHoje =
-        ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'][hoje.weekday % 7];
-
-    final rotinasDoDia =
-        rotinasAtivas.where((r) => r.diasSemana.contains(diaHoje));
-    final lista =
-        rotinasDoDia.isNotEmpty ? rotinasDoDia.toList() : rotinasAtivas;
-
-    lista.sort((a, b) {
-      final horaA = int.tryParse(a.horarioSaida.split(':').first) ?? 0;
-      final minutoA = int.tryParse(a.horarioSaida.split(':').last) ?? 0;
-      final horaB = int.tryParse(b.horarioSaida.split(':').first) ?? 0;
-      final minutoB = int.tryParse(b.horarioSaida.split(':').last) ?? 0;
-      final valorA = horaA * 60 + minutoA;
-      final valorB = horaB * 60 + minutoB;
-      return valorA.compareTo(valorB);
-    });
-
-    return lista.isEmpty ? null : lista.first;
-  }
+  Rotina? get _proximaSaida => _rotinaService.proximaSaida(_rotinas);
 
   String get _avisoTexto {
     final rotinasAtivas = _rotinas.where((r) => r.ativa).toList();

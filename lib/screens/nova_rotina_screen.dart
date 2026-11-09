@@ -4,6 +4,7 @@ import '../models/rotina.dart';
 import '../models/endereco.dart';
 import '../services/preferences_service.dart';
 import '../services/endereco_service.dart';
+import '../services/rotina_service.dart';
 
 enum StatusConsultaCep { inicial, carregando, sucesso, erro }
 
@@ -41,6 +42,7 @@ class _NovaRotinaScreenState extends State<NovaRotinaScreen> {
   final _formKey = GlobalKey<FormState>();
   final PreferencesService _preferencesService = PreferencesService();
   final EnderecoService _enderecoService = EnderecoService();
+  final RotinaService _rotinaService = RotinaService();
 
   final _nomeController = TextEditingController(text: 'Casa -> Trabalho');
   final _origemController = TextEditingController();
@@ -206,12 +208,10 @@ class _NovaRotinaScreenState extends State<NovaRotinaScreen> {
   }
 
   Widget _buildConsultaCep({
-    required String titulo,
-    required TextEditingController cepController,
-    required TextEditingController enderecoController,
     required StatusConsultaCep status,
     required String mensagemErro,
     required String textoSucesso,
+    required VoidCallback onTentarNovamente,
   }) {
     switch (status) {
       case StatusConsultaCep.carregando:
@@ -258,39 +258,15 @@ class _NovaRotinaScreenState extends State<NovaRotinaScreen> {
                   Expanded(child: Text(mensagemErro)),
                 ],
               ),
+              TextButton(
+                onPressed: onTentarNovamente,
+                child: const Text('Tentar novamente'),
+              ),
             ],
           ),
         );
       case StatusConsultaCep.inicial:
         return const SizedBox.shrink();
-    }
-  }
-
-  Color _corLinhaPorNome(String linha) {
-    final numero = int.tryParse(linha.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-    switch (numero) {
-      case 1:
-        return const Color(0xFF0B3CFF);
-      case 2:
-        return const Color(0xFF00A651);
-      case 3:
-        return const Color(0xFFE41E2A);
-      case 4:
-        return const Color(0xFFF6C544);
-      case 5:
-        return const Color(0xFF8A4CBE);
-      case 7:
-        return const Color(0xFFB35A9B);
-      case 9:
-        return const Color(0xFF009C71);
-      case 11:
-        return const Color(0xFFF38A42);
-      case 13:
-        return const Color(0xFF4FBF9F);
-      case 15:
-        return const Color(0xFF9CA3AF);
-      default:
-        return Theme.of(context).colorScheme.primary;
     }
   }
 
@@ -367,12 +343,10 @@ class _NovaRotinaScreenState extends State<NovaRotinaScreen> {
                   ],
                 ),
                 _buildConsultaCep(
-                  titulo: 'CEP da origem',
-                  cepController: _cepOrigemController,
-                  enderecoController: _origemController,
                   status: _statusCepOrigem,
                   mensagemErro: _mensagemErroCepOrigem,
                   textoSucesso: 'Endereco preenchido na origem.',
+                  onTentarNovamente: _consultarCepOrigem,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -415,12 +389,10 @@ class _NovaRotinaScreenState extends State<NovaRotinaScreen> {
                   ],
                 ),
                 _buildConsultaCep(
-                  titulo: 'CEP do destino',
-                  cepController: _cepDestinoController,
-                  enderecoController: _destinoController,
                   status: _statusCepDestino,
                   mensagemErro: _mensagemErroCepDestino,
                   textoSucesso: 'Endereco preenchido no destino.',
+                  onTentarNovamente: _consultarCepDestino,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -478,7 +450,10 @@ class _NovaRotinaScreenState extends State<NovaRotinaScreen> {
                   runSpacing: 8,
                   children: _linhasDisponiveis.map((linha) {
                     final selecionada = _linhasSelecionadas.contains(linha);
-                    final cor = _corLinhaPorNome(linha);
+                    final cor = _rotinaService.corLinhaPorNome(
+                      linha,
+                      Theme.of(context).colorScheme.primary,
+                    );
 
                     return ChoiceChip(
                       label: Text(linha),

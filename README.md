@@ -144,7 +144,8 @@ lib/
 │   ├── preferences_service.dart      # SharedPreferences (onboarding, rotinas, minutos, tema)
 │   ├── endereco_service.dart         # consumo HTTP da API ViaCEP
 │   ├── status_linhas_service.dart    # geração do status simulado das linhas
-│   └── recomendacao_service.dart     # motor de recomendação (comparação de tempos)
+│   ├── recomendacao_service.dart     # motor de recomendação (comparação de tempos)
+│   └── rotina_service.dart           # regras para próxima saída e cores das linhas
 ├── theme/
 │   └── theme_toggle_scope.dart       # InheritedWidget que expõe a troca de tema às telas
 ├── screens/
@@ -161,7 +162,7 @@ lib/
     └── linha_status_tile.dart        # item reutilizável de status de linha
 ```
 
-A separação segue o padrão `models / services / screens / widgets`: as telas (`StatefulWidget`) cuidam apenas da interface e chamam os `services` para persistência, consumo HTTP e regras de recomendação, sem lógica de negócio dentro dos widgets. O estado é gerenciado com `setState`, sem bibliotecas externas de gerenciamento de estado. Os widgets `RotinaCard` e `LinhaStatusTile` são reutilizados nas telas, e `SobreScreen` é `StatelessWidget` por não ter estado.
+A separação segue o padrão `models / services / screens / widgets`: as telas (`StatefulWidget`) cuidam da interface e chamam os `services` para persistência, consumo HTTP e regras de negócio, sem lógica de negócio dentro das telas. O estado é gerenciado com `setState`, sem bibliotecas externas de gerenciamento de estado. Os widgets `RotinaCard` e `LinhaStatusTile` são reutilizados nas telas, e `SobreScreen` é `StatelessWidget` por não ter estado.
 
 ## Widgets e conceitos utilizados
 
