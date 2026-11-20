@@ -7,7 +7,7 @@ O **TransitaSP** ajuda o trabalhador a decidir, antes de sair de casa, qual é a
 
 ## Vídeo pitch
 
-Link do vídeo: 
+Link do vídeo: https://www.youtube.com/watch?v=HOqUaS04zT4
 
 ## Desenvolvedores
 
